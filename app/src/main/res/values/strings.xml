@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">PhonePe PG Demo</string>
+    <string name="merchant_id">Merchant Id</string>
+    <string name="select_the_environment">Select the environment:</string>
+    <string name="init_sdk">Init SDK</string>
+    <string name="saved_instruments_token">Saved Instruments Token</string>
+    <string name="get_instruments">Get Instruments</string>
+    <string name="link">Link</string>
+    <string name="order_token">Order Token</string>
+    <string name="pay">Pay</string>
+    <string name="title">Title</string>
+
+    <string-array name="spinner_environment_items">
+        <item>SANDBOX</item>
+        <item>PRODUCTION</item>
+    </string-array>
+</resources>
