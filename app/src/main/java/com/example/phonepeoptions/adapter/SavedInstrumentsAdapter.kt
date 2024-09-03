@@ -31,7 +31,15 @@ class SavedInstrumentsAdapter(private val onInstrumentSelected: (SavedInstrument
             onInstrumentSelected(savedInstrumentsList[position])
         }
 
-        if (!savedInstrumentsList[position].isAvailable) {
+        if (savedInstrumentsList[position].isAvailable) {
+            holder.binding.title.setTextColor(
+                getColor(
+                    holder.binding.title.context,
+                    R.color.enabled
+                )
+            )
+        }
+        else{
             holder.binding.title.setTextColor(
                 getColor(
                     holder.binding.title.context,

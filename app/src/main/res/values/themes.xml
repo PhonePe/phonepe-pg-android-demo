@@ -7,5 +7,6 @@
 
     <style name="Theme.PhonePeOptions" parent="Base.Theme.PhonePeOptions" />
 
+    <color name="enabled">@color/black</color>
     <color name="disabled">#D3D3D3</color>
 </resources>
