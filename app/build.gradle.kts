@@ -48,11 +48,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.constraintlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 
     //PhonePe SDK
-    implementation("phonepe.intentsdk.android.snapshot:IntentSDK:5.0.0-2273535-SNAPSHOT")
+    implementation("phonepe.intentsdk.android.snapshot:IntentSDK:5.0.0-2280232-SNAPSHOT")
 //    implementation("phonepe.intentsdk.android.release:IntentSDK:5.0.0")
 }

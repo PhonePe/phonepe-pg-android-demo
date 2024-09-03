@@ -12,10 +12,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {
-            val myFragment = PaymentOptionsFragment()
             supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container, myFragment)
-                .commit()
+                .add(R.id.fragment_container, PaymentOptionsFragment()).commit()
         }
     }
 
@@ -25,12 +23,12 @@ class MainActivity : AppCompatActivity() {
             REQUEST_CODE -> {
                 when (resultCode) {
                     Activity.RESULT_OK -> {
-                        //RESULT_OK does not mean payment is successful
-                        Toast.makeText(this, "RESULT_OK", Toast.LENGTH_SHORT).show()
+                        //RESULT_OK means you need to start polling for transaction status
+                        Toast.makeText(this, RESULT_OK, Toast.LENGTH_SHORT).show()
                     }
 
                     else -> {
-                        Toast.makeText(this, "RESULT_CANCELED", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, RESULT_CANCELED, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -39,5 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val REQUEST_CODE = 725
+        const val RESULT_OK = "RESULT_OK"
+        const val RESULT_CANCELED = "RESULT_CANCELED"
     }
 }

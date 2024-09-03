@@ -51,8 +51,8 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
     }
 
     private fun setObservers() {
-        paymentOptionsViewModel.showLinkButton.observe(viewLifecycleOwner) {
-            binding.link.visibility = if (it) {
+        paymentOptionsViewModel.isLinkButtonVisible.observe(viewLifecycleOwner) { isVisible ->
+            binding.link.visibility = if (isVisible) {
                 View.VISIBLE
             } else {
                 View.GONE
@@ -67,8 +67,8 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
             savedInstrumentsAdapter.setSelectedInstrument(it)
         }
 
-        paymentOptionsViewModel.showProgressBar.observe(viewLifecycleOwner) {
-            binding.progressBar.visibility = if (it) {
+        paymentOptionsViewModel.isProgressBarVisible.observe(viewLifecycleOwner) { isVisible
+            binding.progressBar.visibility = if (isVisible) {
                 View.VISIBLE
             } else {
                 View.GONE
@@ -93,74 +93,73 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
 
     private fun initSDKClicked() {
         if (binding.merchantId.text.toString().isEmpty()) {
-            Toast.makeText(this.requireContext(), "Enter Merchant Id", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), ENTER_MERCHANT_ID, Toast.LENGTH_SHORT).show()
             return
         }
-        val phonePeEnvironment = if (binding.environment.selectedItem == "SANDBOX") {
+        val phonePeEnvironment = if (binding.environment.selectedItem == SANDBOX) {
             PhonePeEnvironment.SANDBOX
-        } else {//environmentSpinner.selectedItem == "PRODUCTION"
+        } else {//environmentSpinner.selectedItem == PRODUCTION
             PhonePeEnvironment.RELEASE
         }
 
         val flowId = paymentOptionsViewModel.getRandomString(STRING_LENGTH)
 
         val result = PhonePeKt.init(
-            this.requireContext(),
+            requireContext(),
             binding.merchantId.text.toString(),
             flowId,
             phonePeEnvironment
         )
 
         if (result) {
-            Toast.makeText(this.requireContext(), "SDK init successful", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), SDK_INIT_SUCCESSFUL, Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this.requireContext(), "SDK init failed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), SDK_INIT_FAILED, Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun getInstrumentsClicked() {
         if (binding.savedInstrumentsToken.text.toString().isEmpty()) {
             Toast.makeText(
-                this.requireContext(),
-                "Enter Saved Instruments Token",
+                requireContext(),
+                ENTER_SAVED_INSTRUMENTS_TOKEN,
                 Toast.LENGTH_SHORT
             ).show()
         } else {
-            paymentOptionsViewModel.setShowProgressBar(true)
+            paymentOptionsViewModel.setIsProgressBarVisible(true)
             phonePeUserAccount.getUserInstruments(binding.savedInstrumentsToken.text.toString())
         }
     }
 
     private fun payClicked() {
+        val selectedInstrument = paymentOptionsViewModel.selectedInstrument.value
         if (binding.orderToken.text.toString().isEmpty()) {
-            Toast.makeText(this.requireContext(), "Enter Order Token", Toast.LENGTH_SHORT).show()
-        } else if (paymentOptionsViewModel.selectedInstrument.value == null) {
-            Toast.makeText(this.requireContext(), "Select a payment instrument", Toast.LENGTH_SHORT)
+            Toast.makeText(requireContext(), ENTER_ORDER_TOKEN, Toast.LENGTH_SHORT).show()
+        } else if (selectedInstrument == null) {
+            Toast.makeText(requireContext(), SELECT_A_PAYMENT_INSTRUMENT, Toast.LENGTH_SHORT)
                 .show()
-        } else if (paymentOptionsViewModel.selectedInstrument.value?.isAvailable == false) {
+        } else if (!selectedInstrument.isAvailable) {
             Toast.makeText(
-                this.requireContext(),
-                "The selected instrument is currently unavailable",
+                requireContext(),
+                THE_SELECTED_INSTRUMENT_IS_CURRENTLY_UNAVAILABLE,
                 Toast.LENGTH_SHORT
             ).show()
         } else {
             try {
-                paymentOptionsViewModel.selectedInstrument.value?.let { value ->
-                    PhonePeKt.startTransaction(
-                        activity = requireActivity(),
-                        request = TransactionRequest(
-                            orderId = paymentOptionsViewModel.getRandomString(STRING_LENGTH),
-                            token = binding.orderToken.text.toString(),
-                            paymentMode = getPaymentMode(
-                                value.type,
-                                value.accountId
-                            )
-                        ),
-                        requestCode = MainActivity.REQUEST_CODE
-                    )
-                }
+                PhonePeKt.startTransaction(
+                    activity = requireActivity(),
+                    request = TransactionRequest(
+                        orderId = paymentOptionsViewModel.getRandomString(STRING_LENGTH),
+                        token = binding.orderToken.text.toString(),
+                        paymentMode = getPaymentMode(
+                            selectedInstrument.type,
+                            selectedInstrument.accountId
+                        )
+                    ),
+                    requestCode = MainActivity.REQUEST_CODE
+                )
             } catch (ex: PhonePeInitException) {
-                Toast.makeText(this.requireContext(), "Exception: $ex", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), EXCEPTION  + ex, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -176,18 +175,16 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        if (savedInstanceState != null) {
-            phonePeUserAccount.onRestoreInstanceState(savedInstanceState)
-        }
+        phonePeUserAccount.onRestoreInstanceState(savedInstanceState)
     }
 
     //These are phonePeOptionsCallback
     override fun hideLinkButton(reason: LinkButtonHideReason) {
-        paymentOptionsViewModel.setShowLinkButton(false)
+        paymentOptionsViewModel.setIsLinkButtonVisible(false)
     }
 
     override fun onConsentNotGiven() {
-        Toast.makeText(this.requireContext(), "Consent not given by user", Toast.LENGTH_SHORT)
+        Toast.makeText(requireContext(), CONSENT_NOT_GIVEN_BY_USER, Toast.LENGTH_SHORT)
             .show()
     }
 
@@ -196,18 +193,18 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
         instruments: List<Instrument>?,
         additionalInfo: String?
     ) {
-        paymentOptionsViewModel.setShowProgressBar(false)
+        paymentOptionsViewModel.setIsProgressBarVisible(false)
 
         if (resultCode != InstrumentsResultCode.SUCCESS) {
             Toast.makeText(
-                this.requireContext(),
-                "InstrumentsResultCode: $resultCode",
+                requireContext(),
+                INSTRUMENTS_RESULT_CODE + resultCode,
                 Toast.LENGTH_SHORT
             ).show()
         } else if (instruments.isNullOrEmpty()) {
             Toast.makeText(
-                this.requireContext(),
-                "No instruments found",
+                requireContext(),
+                NO_INSTRUMENTS_FOUND,
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -220,11 +217,23 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
     }
 
     override fun showLinkButton() {
-        paymentOptionsViewModel.setShowProgressBar(false)
-        paymentOptionsViewModel.setShowLinkButton(true)
+        paymentOptionsViewModel.setIsProgressBarVisible(false)
+        paymentOptionsViewModel.setIsLinkButtonVisible(true)
     }
 
     companion object{
         private const val STRING_LENGTH = 20
+        private const val SDK_INIT_SUCCESSFUL = "SDK init successful"
+        private const val SDK_INIT_FAILED = "SDK init failed"
+        private const val ENTER_SAVED_INSTRUMENTS_TOKEN = "Enter Saved Instruments Token"
+        private const val ENTER_ORDER_TOKEN = "Enter Order Token"
+        private const val SELECT_A_PAYMENT_INSTRUMENT = "Select a payment instrument"
+        private const val THE_SELECTED_INSTRUMENT_IS_CURRENTLY_UNAVAILABLE = "The selected instrument is currently unavailable"
+        private const val CONSENT_NOT_GIVEN_BY_USER = "Consent not given by user"
+        private const val NO_INSTRUMENTS_FOUND = "No instruments found"
+        private const val EXCEPTION = "Exception: "
+        private const val INSTRUMENTS_RESULT_CODE = "InstrumentsResultCode: "
+        private const val ENTER_MERCHANT_ID = "Enter Merchant Id"
+        private const val SANDBOX = "SANDBOX"
     }
 }

@@ -7,8 +7,8 @@ import com.example.phonepeoptions.adapter.SavedInstrumentsListItem
 import com.phonepe.intent.sdk.api.ppeInstruments.models.Instrument
 
 class PaymentOptionsViewModel : ViewModel() {
-    private val _showLinkButton = MutableLiveData(false)
-    val showLinkButton: LiveData<Boolean> = _showLinkButton
+    private val _isLinkButtonVisible = MutableLiveData(false)
+    val isLinkButtonVisible: LiveData<Boolean> = _isLinkButtonVisible
 
     private val _savedInstrumentsList = MutableLiveData<List<SavedInstrumentsListItem>>()
     val savedInstrumentsList: LiveData<List<SavedInstrumentsListItem>> get() = _savedInstrumentsList
@@ -16,11 +16,11 @@ class PaymentOptionsViewModel : ViewModel() {
     private val _selectedInstrument = MutableLiveData<SavedInstrumentsListItem?>()
     val selectedInstrument: LiveData<SavedInstrumentsListItem?> = _selectedInstrument
 
-    private val _showProgressBar = MutableLiveData(false)
-    val showProgressBar: LiveData<Boolean> = _showProgressBar
+    private val _isProgressBarVisible = MutableLiveData(false)
+    val isProgressBarVisible: LiveData<Boolean> = _isProgressBarVisible
 
     fun getRandomString(length: Int): String {
-        val allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        val allowedChars = ALPHA_NUMERIC_STRING
         return (1..length)
             .map { allowedChars.random() }
             .joinToString("")
@@ -40,20 +40,23 @@ class PaymentOptionsViewModel : ViewModel() {
         }
     }
 
-    fun setShowLinkButton(visibility: Boolean) {
-        _showLinkButton.postValue(visibility)
+    fun setIsLinkButtonVisible(isVisible: Boolean) {
+        _isLinkButtonVisible.postValue(isVisible)
     }
 
     fun updateSavedInstrumentsList(newList: List<SavedInstrumentsListItem>?) {
         _savedInstrumentsList.value = newList ?: emptyList()
     }
 
-
-    fun setShowProgressBar(visibility: Boolean) {
-        _showProgressBar.postValue(visibility)
+    fun setIsProgressBarVisible(isVisible: Boolean) {
+        _isProgressBarVisible.postValue(isVisible)
     }
 
     fun setSelectedInstrument(selectedInstrumentListItem: SavedInstrumentsListItem?){
         _selectedInstrument.postValue(selectedInstrumentListItem)
+    }
+
+    companion object {
+        private const val ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
     }
 }

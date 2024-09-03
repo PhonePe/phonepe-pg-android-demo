@@ -3,12 +3,14 @@ package com.example.phonepeoptions.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getColor
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.phonepeoptions.R
 import com.example.phonepeoptions.databinding.SavedInstrumentsListItemBinding
 
 class SavedInstrumentsAdapter(private val onInstrumentSelected: (SavedInstrumentsListItem) -> Unit) :
-    RecyclerView.Adapter<SavedInstrumentsAdapter.SavedInstrumentsViewHolder>() {
+    ListAdapter<SavedInstrumentsListItem, SavedInstrumentsAdapter.SavedInstrumentsViewHolder>(SavedInstrumentsDiffCallback()) {
 
     private var savedInstrumentsList: List<SavedInstrumentsListItem> = emptyList()
     private var selectedInstrument: SavedInstrumentsListItem? = null
@@ -53,4 +55,20 @@ class SavedInstrumentsAdapter(private val onInstrumentSelected: (SavedInstrument
     }
 
     inner class SavedInstrumentsViewHolder(val binding: SavedInstrumentsListItemBinding) : RecyclerView.ViewHolder(binding.root)
+
+    class SavedInstrumentsDiffCallback: DiffUtil.ItemCallback<SavedInstrumentsListItem>() {
+        override fun areItemsTheSame(
+            oldItem: SavedInstrumentsListItem,
+            newItem: SavedInstrumentsListItem
+        ): Boolean {
+            return oldItem.title == newItem.title
+        }
+
+        override fun areContentsTheSame(
+            oldItem: SavedInstrumentsListItem,
+            newItem: SavedInstrumentsListItem
+        ): Boolean {
+            return oldItem == newItem
+        }
+    }
 }
