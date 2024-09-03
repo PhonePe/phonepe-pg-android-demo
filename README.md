@@ -8,4 +8,4 @@ Sample App to demonstrate the integration of PhonePe PG SDK Android package.
 > [!WARNING]  
 > Without valid input this sample app will not work.
 
-After gradle sync, the apk can be built and installed to check out the sample app.
+Open the project and wait for the gradle sync. Once it’s complete, run the project to use our sample app.

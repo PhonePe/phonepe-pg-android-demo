@@ -67,7 +67,7 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
             savedInstrumentsAdapter.setSelectedInstrument(it)
         }
 
-        paymentOptionsViewModel.isProgressBarVisible.observe(viewLifecycleOwner) { isVisible
+        paymentOptionsViewModel.isProgressBarVisible.observe(viewLifecycleOwner) { isVisible ->
             binding.progressBar.visibility = if (isVisible) {
                 View.VISIBLE
             } else {
