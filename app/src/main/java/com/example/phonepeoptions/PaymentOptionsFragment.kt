@@ -1,12 +1,17 @@
 package com.example.phonepeoptions
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.phonepeoptions.adapter.SavedInstrumentsAdapter
 import com.example.phonepeoptions.databinding.PaymentOptionsFragmentBinding
@@ -26,7 +31,26 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
     private val paymentOptionsViewModel: PaymentOptionsViewModel by viewModels()
     private lateinit var savedInstrumentsAdapter: SavedInstrumentsAdapter
 
-    private lateinit var phonePeUserAccount: PhonePeUserAccount
+    private val activityResultLauncherForLink: ActivityResultLauncher<Intent> = registerForActivityResult(
+        StartActivityForResult()
+    ) { activityResult ->
+        PhonePeUserAccount.handleCallback(activityResult)
+    }
+
+    private val activityResultLauncherForStartTransaction: ActivityResultLauncher<Intent> = registerForActivityResult(
+        StartActivityForResult()
+    ) { activityResult ->
+        when (activityResult.resultCode) {
+            Activity.RESULT_OK -> {
+                //RESULT_OK means you need to start polling for transaction status
+                Toast.makeText(this.requireContext(), RESULT_OK, Toast.LENGTH_SHORT).show()
+            }
+
+            else -> {
+                Toast.makeText(this.requireContext(), RESULT_CANCELED, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +69,7 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
         setOnClickListeners()
         setObservers()
 
-        phonePeUserAccount = PhonePeUserAccount(this)
+        PhonePeUserAccount.init(this.lifecycleScope, this)
 
         return binding.root
     }
@@ -127,7 +151,7 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
             ).show()
         } else {
             paymentOptionsViewModel.setIsProgressBarVisible(true)
-            phonePeUserAccount.getUserInstruments(binding.savedInstrumentsToken.text.toString())
+            PhonePeUserAccount.getUserInstruments(binding.savedInstrumentsToken.text.toString())
         }
     }
 
@@ -147,7 +171,7 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
         } else {
             try {
                 PhonePeKt.startTransaction(
-                    activity = requireActivity(),
+                    context = requireContext(),
                     request = TransactionRequest(
                         orderId = paymentOptionsViewModel.getRandomString(STRING_LENGTH),
                         token = binding.orderToken.text.toString(),
@@ -156,7 +180,7 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
                             selectedInstrument.accountId
                         )
                     ),
-                    requestCode = MainActivity.REQUEST_CODE
+                    activityResultLauncher = activityResultLauncherForStartTransaction
                 )
             } catch (ex: PhonePeInitException) {
                 Toast.makeText(requireContext(), EXCEPTION  + ex, Toast.LENGTH_SHORT).show()
@@ -165,17 +189,7 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
     }
 
     private fun linkClicked() {
-        phonePeUserAccount.linkPhonePe()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        phonePeUserAccount.onSaveInstanceState(outState)
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        phonePeUserAccount.onRestoreInstanceState(savedInstanceState)
+        PhonePeUserAccount.linkPhonePe(activityResultLauncherForLink)
     }
 
     //These are phonePeOptionsCallback
@@ -235,5 +249,7 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
         private const val INSTRUMENTS_RESULT_CODE = "InstrumentsResultCode: "
         private const val ENTER_MERCHANT_ID = "Enter Merchant Id"
         private const val SANDBOX = "SANDBOX"
+        private const val RESULT_OK = "RESULT_OK"
+        private const val RESULT_CANCELED = "RESULT_CANCELED"
     }
 }
