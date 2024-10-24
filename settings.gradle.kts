@@ -21,8 +21,7 @@ dependencyResolutionManagement {
 
         //PhonePe SDK
         maven {
-            url  = URI("https://phonepe.mycloudrepo.io/public/repositories/phonepe-intentsdk-snapshots")//PhonePe SDK Snapshot url
-//            url  = URI("https://phonepe.mycloudrepo.io/public/repositories/phonepe-intentsdk-android")//PhonePe SDK Production url
+            url  = URI("https://phonepe.mycloudrepo.io/public/repositories/phonepe-intentsdk-android")
         }
     }
 }

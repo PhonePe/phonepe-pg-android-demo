@@ -31,12 +31,6 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
     private val paymentOptionsViewModel: PaymentOptionsViewModel by viewModels()
     private lateinit var savedInstrumentsAdapter: SavedInstrumentsAdapter
 
-    private val activityResultLauncherForLink: ActivityResultLauncher<Intent> = registerForActivityResult(
-        StartActivityForResult()
-    ) { activityResult ->
-        PhonePeUserAccount.handleCallback(activityResult)
-    }
-
     private val activityResultLauncherForStartTransaction: ActivityResultLauncher<Intent> = registerForActivityResult(
         StartActivityForResult()
     ) { activityResult ->
@@ -69,9 +63,19 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
         setOnClickListeners()
         setObservers()
 
-        PhonePeUserAccount.init(this.lifecycleScope, this)
+        PhonePeUserAccount.setLifecycleCoroutineScope(this.lifecycleScope)
+        PhonePeUserAccount.setPhonePeUserAccountProvider(this)
+        PhonePeUserAccount.setActivityResultCaller(this)
 
         return binding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        PhonePeUserAccount.unsetLifecycleCoroutineScope()
+        PhonePeUserAccount.unsetPhonePeUserAccountProvider()
+        PhonePeUserAccount.unsetActivityResultCaller()
     }
 
     private fun setObservers() {
@@ -189,7 +193,7 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
     }
 
     private fun linkClicked() {
-        PhonePeUserAccount.linkPhonePe(activityResultLauncherForLink)
+        PhonePeUserAccount.linkPhonePe()
     }
 
     //These are phonePeOptionsCallback
