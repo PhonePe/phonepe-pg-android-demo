@@ -50,5 +50,5 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 
     //PhonePe SDK
-    implementation("phonepe.intentsdk.android.release:IntentSDK:5.0.2")
+    implementation("phonepe.intentsdk.android.release:IntentSDK:5.1.0")
 }

@@ -19,9 +19,9 @@ import com.phonepe.intent.sdk.api.PhonePeInitException
 import com.phonepe.intent.sdk.api.PhonePeKt
 import com.phonepe.intent.sdk.api.models.PhonePeEnvironment
 import com.phonepe.intent.sdk.api.models.transaction.TransactionRequest
+import com.phonepe.intent.sdk.api.models.transaction.paymentMode.PpeIntentPaymentMode
 import com.phonepe.intent.sdk.api.ppeInstruments.PhonePeUserAccount
 import com.phonepe.intent.sdk.api.ppeInstruments.contract.PhonePeUserAccountProvider
-import com.phonepe.intent.sdk.api.ppeInstruments.helpers.PhonePeInstrumentHelper.getPaymentMode
 import com.phonepe.intent.sdk.api.ppeInstruments.models.Instrument
 import com.phonepe.intent.sdk.api.ppeInstruments.models.InstrumentsResultCode
 import com.phonepe.intent.sdk.api.ppeInstruments.models.LinkButtonHideReason
@@ -179,9 +179,9 @@ class PaymentOptionsFragment : Fragment(), PhonePeUserAccountProvider {
                     request = TransactionRequest(
                         orderId = paymentOptionsViewModel.getRandomString(STRING_LENGTH),
                         token = binding.orderToken.text.toString(),
-                        paymentMode = getPaymentMode(
+                        paymentMode = PpeIntentPaymentMode(
                             selectedInstrument.type,
-                            selectedInstrument.accountId
+                            selectedInstrument.id
                         )
                     ),
                     activityResultLauncher = activityResultLauncherForStartTransaction

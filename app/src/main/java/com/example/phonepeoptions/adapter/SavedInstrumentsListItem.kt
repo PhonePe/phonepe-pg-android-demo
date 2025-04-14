@@ -5,7 +5,11 @@ data class SavedInstrumentsListItem(
     val title: String,
     val subTitle: String?,
     val logoUrl: String,
-    val accountId: String?,
     val isAvailable: Boolean,
     val priority: Int,
+    val networkLogoUrl: String?,
+    val bankCode: String?,
+    val id: String?,
+    val metaInfo: Any?,
+    val subType: String?
 )

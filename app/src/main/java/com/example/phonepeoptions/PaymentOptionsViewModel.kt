@@ -33,9 +33,13 @@ class PaymentOptionsViewModel : ViewModel() {
                 it.title,
                 it.subTitle,
                 it.logoUrl,
-                it.accountId,
                 it.isAvailable,
-                it.priority
+                it.priority,
+                it.networkLogoUrl,
+                it.bankCode,
+                it.id,
+                it.metaInfo,
+                it.subType
             )
         }
     }
